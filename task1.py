@@ -1,27 +1,46 @@
-num = int(input())
-base = int(input("Base (2-9): "))
-if not(2 <= base <= 9):
-    quit()
+import sys
 
-newNum = ''
+def isDataCorrect(nb, baseSrc, baseDst):
+    return False if len(nb) == 0 or len(baseSrc) == 0 or len(set(baseDst)) != len(baseDst) or len(set(nb).union(set(baseSrc))) != len(baseSrc) else True
 
-while num > 0:
-    newNum = str(num % base) + newNum
-    num //= base
+def itoBaseTen(nb, baseSrc):
+    baseTen = [baseSrc.index(x) for x in reversed(nb)]
+    for i in range(len(baseTen)):
+        baseTen[i] *= len(baseSrc) ** i
+    return sum(baseTen)
 
-print(newNum)
+def itoBaseDst(nb, baseDst):
+    alphabet = baseDst
+    baseDst = len(baseDst)
+    nbInNewBase = []
+    while(nb >= baseDst):
+         nbInNewBase.append(nb % baseDst)
+         nb //= baseDst
+    nbInNewBase.append(nb)
+    return "".join([alphabet[x] for x in reversed(nbInNewBase)])
 
-from random import random
+def itoBase(nb, base, baseDst = None):
+    if  isinstance(baseDst, str):
+        if not isDataCorrect(nb, base, baseDst):
+            return "usage"
+        nb = itoBaseTen(nb, base)
+        return str(itoBaseDst(nb, baseDst))
+    else:
+        if not isDataCorrect(str(nb), base, ""):
+            return "usage"
+        return str(itoBaseDst(int(nb), base))
 
-N = 255
-a = [0]*N
-summa = 0
-for i in range(N):
-    a[i] = int(random()*20)
-    print('%3d' % a[i], end='')
-    b = a[i]
-    while b > 0:
-        summa += b % 10
-        b //= 10
-print()
-print(summa)
+if __name__ == "__main__":
+    sys.argv = sys.argv[1:]
+    if len (sys.argv) == 2:
+        nb = sys.argv[0]
+        base = sys.argv[1]
+        print(itoBase(nb, base))
+    elif len (sys.argv) == 3:
+        nb = sys.argv[0]
+        base = sys.argv[1]
+        baseDst = sys.argv[2]
+        print(itoBase(nb, base, baseDst))
+    elif len (sys.argv) > 3 or len (sys.argv) < 2:
+        print ("usage")
+        sys.exit (1)
